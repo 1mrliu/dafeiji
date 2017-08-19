@@ -6,7 +6,7 @@ import random
 '''
 使用面向对象的方法实现
 '''
-        #定义基类
+#定义基类
 class Base():
     def __init__(self,screen,name):
         #设置要显示内容的窗口
@@ -15,22 +15,20 @@ class Base():
 
 
 
-        #创建一个飞机类，继承自基类
+#创建一个飞机类，继承自基类
 class Plane(Base):
-        #重写了基类的__init__方法
+    #重写了基类的__init__方法
     def __init__(self,screen,name):
         super().__init__(screen,name)
-
         #根据名字生成飞机图片
         self.image = pygame.image.load(self.imageName).convert()
-
         #用来保存飞机的所有导弹
         self.missList = []
-        #显示的方法
+
+    #显示的方法
     def display(self):
         #更新飞机的位置
         self.screen.blit(self.image,(self.x,self.y))
-
         #存放需需要删除的对象的信息
         needDelItemList = []
 
@@ -40,11 +38,12 @@ class Plane(Base):
 
         for i in needDelItemList:
             self.missList.remove(i)
+
         #遍历飞机所有的导弹信息
-        for daodan in self.missList:
-            daodan.display()
+        for missile in self.missList:
+            missile.display()
             #修改导弹的位置信息
-            daodan.move()
+            missile.move()
 
     def shedaodan(self):
         mislist = MissList(self.x,self.y,self.screen,self.name)
@@ -57,19 +56,19 @@ class GamePlane(Plane):
             self.x = 230
             self.y = 600
             self.imageName = './feiji/hero.gif'
-
             super().__init__(screen,name)
-
-
 
         #向左移动
         def moveLeft(self):
             self.x-=10
+
         #向右移动
         def moveRight(self):
             self.x+=10
-        def shedaodan(self):
+
+        def fire(self):
             super().shedaodan()
+
 
         #创建一个敌人飞机类,继承自飞机类
 class EnemyPlane(Plane):
@@ -82,6 +81,7 @@ class EnemyPlane(Plane):
         #调用父类的__init__方法
             super().__init__(screen,name)
             self.direction='right'
+
         def move(self):
             #如果碰到了右边的边界就往左走，如果碰到了左边的就往右走
             if self.direction=='right':
@@ -93,6 +93,10 @@ class EnemyPlane(Plane):
             elif self.x<0:
                 self.direction='right'
 
+        def shedaodan(self):
+            num = random.randint(1,100)
+            if num==88:
+                super().shedaodan()
 
         #创建一个导弹类，继承自基类
 class  MissList(Base):
@@ -109,23 +113,24 @@ class  MissList(Base):
                 self.x=x+30
                 self.y=y+30
             self.image=pygame.image.load(imageName).convert()
+
         #导弹的移动方法
         def move(self):
             if self.name=='game':
                 self.y-=2
             elif self.name=='enemy':
                 self.y+=2
+
         #导弹的显示方法
         def display(self):
             self.screen.blit(self.image,(self.x,self.y))
+
         #判断导弹是否超出屏幕的范围
         def judge(self):
-            if self.y<0 or self.y>480:
+            if self.y<0 or self.y>890:
                 return True
             else:
                 return False
-
-
 
 '''
 1.搭建界面
@@ -175,7 +180,7 @@ if __name__ == '__main__' :
             # 检测键盘是否是空格
             elif event.key == K_SPACE:
                 print("space")
-                gamePlane.shedaodan()
+                gamePlane.fire()
 
         # 更新需要显示的内容
         pygame.display.update()
