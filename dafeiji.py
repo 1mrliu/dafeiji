@@ -1,64 +1,59 @@
 # coding = UTF8
 import pygame
 from pygame.locals import *
-
+import random
 
 '''
-用面向对象的方式显示飞机，并控制左右运动
-1.实现飞机在你想出现的位置显示
-2.用按键控制飞机移动
-3.按下空格时，显示一颗子弹
+使用面向对象的方法实现
 '''
-class HeroPlane(object):
-
-    def __init__(self,screen):
-
-        #设置飞机的默认位置
-        self.x = 230
-        self.y = 650
-
+        #定义基类
+class Base():
+    def __init__(self,screen,name):
         #设置要显示内容的窗口
         self.screen = screen
+        self.name = name
+
+
+
+        #创建一个飞机类，继承自基类
+class Plane(Base):
+        #重写了基类的__init__方法
+    def __init__(self,screen,name):
+        super().__init__(screen,name)
 
         #根据名字生成飞机图片
-        self.image = pygame.image.load("./feiji/hero.gif").convert()
+        self.image = pygame.image.load(self.imageName).convert()
 
-        #用来保存英雄飞机的子弹
-        self.bulletList = []
-
+        #用来保存飞机的所有导弹
+        self.missList = []
+        #显示的方法
     def display(self):
+        #更新飞机的位置
         self.screen.blit(self.image,(self.x,self.y))
 
-
-        #存放需需要删除的子弹的信息
-
+        #存放需需要删除的对象的信息
         needDelItemList = []
 
-        for i in self.bulletList:
+        for i in self.missList:
             if i.judge():
                 needDelItemList.append(i)
 
         for i in needDelItemList:
-            self.bulletList.remove(i)
+            self.missList.remove(i)
+        #遍历飞机所有的导弹信息
+        for daodan in self.missList:
+            daodan.display()
+            #修改导弹的位置信息
+            daodan.move()
+
+    def shedaodan(self):
+        mislist = MissLis(self.x,self.y,self.screen,self.name)
+        self.missList.append(mislist)
+        #创建一个玩家飞机类，继承自飞机类
+class GamePlane(Plane):
+        #重写
 
 
-
-
-
-
-        for bullet in self.bulletList:
-            bullet.display()
-            bullet.move()
-
-    def moveLeft(self):
-        self.x -=10
-
-    def moveRight(self):
-        self.x +=10
-
-    def sheBullet(self):
-        newBullet = Bullet(self.x,self.y,self.screen)
-        self.bulletList.append(newBullet)
 
 
 class  Bullet(object):
