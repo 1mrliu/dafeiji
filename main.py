@@ -13,8 +13,6 @@ class Base():
         self.screen = screen
         self.name = name
 
-
-
 #创建一个飞机类，继承自基类
 class Plane(Base):
     #重写了基类的__init__方法
@@ -55,7 +53,7 @@ class GamePlane(Plane):
             #设置玩家飞机的默认位置
             self.x = 230
             self.y = 600
-            self.imageName = './feiji/hero.gif'
+            self.imageName = './images/hero.gif'
             super().__init__(screen,name)
 
         #向左移动
@@ -77,8 +75,8 @@ class EnemyPlane(Plane):
         #设置敌机的默认位置
             self.x=0
             self.y=0
-            self.imageName='./feiji/enemy-1.gif'
-        #调用父类的__init__方法
+            self.imageName='./images/enemy-1.gif'
+            #调用父类的__init__方法
             super().__init__(screen,name)
             self.direction='right'
 
@@ -93,7 +91,7 @@ class EnemyPlane(Plane):
             elif self.x<0:
                 self.direction='right'
 
-        def shedaodan(self):
+        def fire(self):
             num = random.randint(1,100)
             if num==88:
                 super().shedaodan()
@@ -105,11 +103,11 @@ class  MissList(Base):
             super().__init__(screen,planeName)
         #根据飞机的名字来选择导弹的类型，并设置导弹的运动方向
             if planeName =='game':
-                imageName='./feiji/bullet-3.gif'
+                imageName='./images/bullet-3.gif'
                 self.x=x+40
                 self.y=y-20
             elif planeName=='enemy':
-                imageName='./feiji/bullet-1.gif'
+                imageName='./images/bullet-1.gif'
                 self.x=x+30
                 self.y=y+30
             self.image=pygame.image.load(imageName).convert()
@@ -137,10 +135,12 @@ class  MissList(Base):
 '''
 
 if __name__ == '__main__' :
-    # 1.创建一个窗口用来实现窗口
+    # 1.创建一个窗口用来实现游戏窗口
     screen = pygame.display.set_mode((480,890),0,32)
+    #设置游戏的名字
+    pygame.display.set_caption('打飞机')
     # 2.创建一个和窗口大小一样的图片，用来放置图片
-    background = pygame.image.load("./feiji/background.png").convert()
+    background = pygame.image.load("./images/background.png").convert()
     #创建一个玩家飞机对象
     gamePlane = GamePlane(screen,'game')
     #创建一个敌人飞机对象
@@ -150,8 +150,10 @@ if __name__ == '__main__' :
     while True:
         # 设定需要显示的背景图
         screen.blit(background,(0,0))
+
         gamePlane.display()
-        enemyPlane.shedaodan()
+
+        enemyPlane.fire()
         enemyPlane.move()
         enemyPlane.display()
 
