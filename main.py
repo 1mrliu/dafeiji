@@ -43,10 +43,11 @@ class Plane(Base):
             #修改导弹的位置信息
             missile.move()
 
-    def shedaodan(self):
+    def Fire(self):
         mislist = MissList(self.x,self.y,self.screen,self.name)
         self.missList.append(mislist)
-        #创建一个玩家飞机类，继承自飞机类
+
+#创建一个玩家飞机类，继承自飞机类
 class GamePlane(Plane):
         #重写父类的方法
         def __init__(self,screen,name):
@@ -54,21 +55,29 @@ class GamePlane(Plane):
             self.x = 230
             self.y = 600
             self.imageName = './images/hero.gif'
+
             super().__init__(screen,name)
+
 
         #向左移动
         def moveLeft(self):
+            #print('检测是否是向左移动。。。。。。。')
             self.x-=10
+            '''设置self.x==0时，因为图像有空白透明部分未显示，因此出现与左边有间隔的情况'''
+            if self.x < 0:
+                self.x+=10
 
         #向右移动
         def moveRight(self):
             self.x+=10
+            if self.x >= 480-90:
+                self.x-=10
 
         def fire(self):
-            super().shedaodan()
+            super().Fire()
 
 
-        #创建一个敌人飞机类,继承自飞机类
+#创建一个敌人飞机类,继承自飞机类
 class EnemyPlane(Plane):
         #重写父类的__init__方法
         def __init__(self,screen,name):
@@ -76,6 +85,9 @@ class EnemyPlane(Plane):
             self.x=0
             self.y=0
             self.imageName='./images/enemy-1.gif'
+
+            # 获取飞机图像的掩膜进行更加精确的检测
+            #self.mask = pygame.mask.from_surface(self.imageName)
             #调用父类的__init__方法
             super().__init__(screen,name)
             self.direction='right'
@@ -94,9 +106,9 @@ class EnemyPlane(Plane):
         def fire(self):
             num = random.randint(1,100)
             if num==88:
-                super().shedaodan()
+                super().Fire()
 
-        #创建一个导弹类，继承自基类
+#创建一个导弹类，继承自基类
 class  MissList(Base):
         #重写基类的__init__方法
         def __init__(self,x,y,screen,planeName):
@@ -107,9 +119,15 @@ class  MissList(Base):
                 self.x=x+40
                 self.y=y-20
             elif planeName=='enemy':
-                imageName='./images/bullet-1.gif'
-                self.x=x+30
-                self.y=y+30
+                num = random.randint(1,100)
+                if num==2:
+                    imageName='./images/bomb-1.gif'
+                    self.x=x+30
+                    self.y=y+30
+                else:
+                    imageName = './images/bullet-1.gif'
+                    self.x = x + 30
+                    self.y = y + 30
             self.image=pygame.image.load(imageName).convert()
 
         #导弹的移动方法
@@ -129,6 +147,11 @@ class  MissList(Base):
                 return True
             else:
                 return False
+
+#碰撞检测
+class checkHit(Base):
+    def __init__(self,x,y,screen):
+      misslist = MissList(self.x,self.y)
 
 '''
 1.搭建界面
@@ -150,9 +173,9 @@ if __name__ == '__main__' :
     while True:
         # 设定需要显示的背景图
         screen.blit(background,(0,0))
-
+        #英雄飞机
         gamePlane.display()
-
+        #敌机
         enemyPlane.fire()
         enemyPlane.move()
         enemyPlane.display()
@@ -164,6 +187,7 @@ if __name__ == '__main__' :
           if event.type == QUIT:
             print("exit")
             exit()
+            # 检测键盘是否按下
           elif event.type == KEYDOWN:
             #检测键盘是否是a或者left
             if  event.key == K_a or event.key == K_LEFT:
