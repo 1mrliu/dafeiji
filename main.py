@@ -2,7 +2,8 @@
 import pygame
 from pygame.locals import *
 import random
-
+from pygame import sprite
+from sys import exit
 '''
 使用面向对象的方法实现
 '''
@@ -55,7 +56,6 @@ class GamePlane(Plane):
             self.x = 230
             self.y = 600
             self.imageName = './images/hero.gif'
-
             super().__init__(screen,name)
 
 
@@ -73,6 +73,20 @@ class GamePlane(Plane):
             if self.x >= 480-90:
                 self.x-=10
 
+        #向上移动
+        def moveUp(self):
+            self.y-=10
+            if self.y<0:
+                self.y+=10
+
+
+        #向下移动
+        def moveDown(self):
+            self.y+=10
+            if self.y>=890-190:
+                self.y-=10
+
+        #发射子弹
         def fire(self):
             super().Fire()
 
@@ -94,14 +108,14 @@ class EnemyPlane(Plane):
 
         def move(self):
             #如果碰到了右边的边界就往左走，如果碰到了左边的就往右走
-            if self.direction=='right':
+            if self.direction == 'right':
                 self.x+=2
-            elif self.direction=='left':
+            elif self.direction == 'left':
                 self.x-=2
             if self.x > 480-50:
-                self.direction='left'
+                self.direction = 'left'
             elif self.x<0:
-                self.direction='right'
+                self.direction = 'right'
 
         def fire(self):
             num = random.randint(1,100)
@@ -114,10 +128,10 @@ class  MissList(Base):
         def __init__(self,x,y,screen,planeName):
             super().__init__(screen,planeName)
         #根据飞机的名字来选择导弹的类型，并设置导弹的运动方向
-            if planeName =='game':
-                imageName='./images/bullet-3.gif'
-                self.x=x+40
-                self.y=y-20
+            if planeName == 'game':
+                imageName = './images/bullet-3.gif'
+                self.x = x+40
+                self.y = y-20
             elif planeName=='enemy':
                 num = random.randint(1,100)
                 if num==2:
@@ -149,12 +163,8 @@ class  MissList(Base):
                 return False
 
 #碰撞检测
-class checkHit(Base):
-    def __init__(self,x,y,screen):
-      misslist = MissList(self.x,self.y)
-
 '''
-1.搭建界面
+搭建界面
 '''
 
 if __name__ == '__main__' :
@@ -184,30 +194,37 @@ if __name__ == '__main__' :
         # 获取事件，比如按键之类
         for event in pygame.event.get():
         # 判断是否是点击了退出按钮
-          if event.type == QUIT:
-            print("exit")
+          if event.type == pygame.QUIT:
+            pygame.quit()
             exit()
             # 检测键盘是否按下
           elif event.type == KEYDOWN:
             #检测键盘是否是a或者left
             if  event.key == K_a or event.key == K_LEFT:
-
                 print('left')
                 gamePlane.moveLeft()
                 #控制飞机向左移动
-                #x-=5
             # 检测键盘是否是d或者right
             elif event.key == K_d or event.key == K_RIGHT:
-
                 print('right')
                 gamePlane.moveRight()
                 #控制飞机向右移动
-
             # 检测键盘是否是空格
             elif event.key == K_SPACE:
                 print("space")
                 gamePlane.fire()
+            #向上移动
+            elif event.key == K_UP or event.key ==K_w:
+                gamePlane.moveUp()
+            #向下移动
+            elif event.key == K_DOWN or event.key == K_s:
+                gamePlane.moveDown()
 
-        # 更新需要显示的内容
+            #使用碰撞检测函数
+        result = pygame.sprite.collide_rect(gamePlane,enemyPlane)
+        if result:
+            print('BOMB')
+
+        # 更新显示的内容
         pygame.display.update()
 
